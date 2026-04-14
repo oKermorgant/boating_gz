@@ -342,12 +342,6 @@
       <uri>https://fuel.gazebosim.org/1.0/openrobotics/models/sydney_regatta</uri>
     </include>
 
-    <include>
-      <name>Coast Waves</name>
-      <pose>0 0 0 0 0 0</pose>
-      <uri>coast_waves</uri>
-    </include>
-
     <!-- The posts for securing the WAM-V -->
     <include>
       <name>post_0</name>
@@ -388,8 +382,16 @@
       <uri>https://fuel.gazebosim.org/1.0/openrobotics/models/ground_station</uri>
     </include>
 
+    <!-- The wave visual -->
+    <include>
+      <name>Coast Waves</name>
+      <pose>0 0 0 0 0 0</pose>
+      <uri>coast_waves</uri>
+    </include>
+
+
     <!-- The wave field -->
-    <plugin filename="libPublisherPlugin.so" name="maritime::PublisherPlugin">
+    <plugin filename="boating-PublisherPlugin" name="boating::PublisherPlugin">
       <message type="gz.msgs.Param" topic="/gazebo/wavefield/parameters"
                every="2.0">
         params {
@@ -422,13 +424,6 @@
         }
       </message>
     </plugin>
-
-    <!-- Uncomment this block to load the WAM-V model-->
-    <!-- <include>
-      <name>wam-V</name>
-      <pose>-532 162 0 0 0 1</pose>
-      <uri>wam-v</uri>
-    </include> -->
 
   </world>
 </sdf>

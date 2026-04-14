@@ -115,6 +115,7 @@ list(APPEND BOATING_GZ_SRC
   WaveVisual
   Anemometer
   LiftDrag
+  PublisherPlugin
 )
 
 foreach(PLUGIN ${BOATING_GZ_SRC})
