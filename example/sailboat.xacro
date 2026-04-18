@@ -1,0 +1,257 @@
+  <?xml version="1.0" ?>
+
+  <!-- rigid wing with gazebo plugins for dynamics -->
+  <robot name="sailboat" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+    <xacro:arg name="mast" default="0.3"/>
+    <xacro:property name="mast" value="$(arg mast)"/>
+    <xacro:arg name="rudder_x" default="-2.1"/>
+    <xacro:arg name="rudder_z" default="-0.05"/>
+
+    <xacro:property name="zsurf" value="-0.15"/>
+
+
+  <!-- Dummy inertia for now -->
+    <xacro:macro name="inertia" params="mass">
+      <inertial>
+        <mass value="${mass}"/>
+        <inertia  izz="${mass}" ixy="0.0"  ixz="0.0"
+                  iyy="${mass}" iyz="0.0"
+                  ixx="${mass}" />
+      </inertial>
+  </xacro:macro>
+
+    <material name="hull">
+      <color rgba=".9 .9 .9 1"/>
+    </material>
+    <material name="wing">
+      <color rgba=".8 .7 0 1"/>
+    </material>
+      <material name="rudder">
+      <color rgba=".9 .9 .9 1"/>
+    </material>
+    <material name="grey">
+      <color rgba=".3 .3 .3 1"/>
+    </material>
+
+    <gazebo>
+      <enable_wind>true</enable_wind>
+    </gazebo>
+
+    <link name="sailboat/base_link">
+      <visual>
+        <geometry>
+          <mesh filename="file://$(find boating_gz)/example/mesh/hull.stl"/>
+        </geometry>
+        <material name="hull"/>
+      </visual>
+        <visual>
+        <origin xyz="0 0 ${1.5*mast}"/>
+        <geometry>
+          <cylinder length="${2*mast}" radius=".04"/>
+        </geometry>
+        <material name="grey"/>
+      </visual>
+
+      <!-- Simple model collision -->
+      <collision name="main_float">
+        <geometry>
+          <mesh filename="file://$(find boating_gz)/example/mesh/hull.stl"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 -1."/>
+        <!-- TODO update inertia -->
+        <mass value="100.0"/>
+        <inertia ixx="120.0" ixy="0.0" ixz="0.0" iyy="393" iyz="0.0" izz="446.0"/>
+      </inertial>
+    </link>
+
+
+    <!-- wing -->
+
+    <link name="sailboat/wing">
+        <visual>
+        <geometry>
+          <mesh filename="file://$(find boating_gz)/example/mesh/wing.stl"/>
+        </geometry>
+        <material name="wing"/>
+      </visual>
+      <xacro:inertia mass=".002"/>
+    </link>
+
+    <joint name="wing_joint" type="revolute">
+      <parent link="sailboat/base_link"/>
+      <child link="sailboat/wing"/>
+      <axis xyz="0 0 1"/>
+      <origin rpy="0 0 0" xyz="0 0 ${2*mast}"/>
+      <limit effort="100" velocity="100" lower="${-.8*pi/2}" upper="${.8*pi/2}"/>
+      <dynamics damping="0.05" friction="0.05"/>
+    </joint>
+
+  <!-- Rudder -->
+    <link name="sailboat/rudder">
+        <visual>
+        <geometry>
+          <mesh filename="file://$(find boating_gz)/example/mesh/rudder.stl"/>
+        </geometry>
+        <material name="rudder"/>
+      </visual>
+      <xacro:inertia mass="2"/>
+    </link>
+
+    <joint name="rudder_joint" type="revolute">
+      <parent link="sailboat/base_link"/>
+      <child link="sailboat/rudder"/>
+      <axis xyz="0 0 1"/>
+      <origin rpy="0 0 0" xyz="$(arg rudder_x) 0 $(arg rudder_z)"/>
+      <limit effort="100" velocity="100" lower="${-pi/4}" upper="${pi/4}"/>
+      <dynamics damping="0.05" friction="0.05"/>
+    </joint>
+
+
+
+    <!-- Engine / propellers -->
+
+    <link name="sailboat/propeller">
+      <visual>
+        <geometry>
+          <mesh filename="file://$(find boating_gz)/example/mesh/propeller.dae"
+                scale=".4 .4 .4"/>
+        </geometry>
+      </visual>
+      <collision name="propeller_collision">
+        <origin rpy="0 1.57 0" xyz="-0.08 0 0"/>
+        <geometry>
+          <cylinder length="0.18" radius="0.24"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="0.5"/>
+        <inertia ixx="0.008545" ixy="0.0" ixz="0.0" iyy="0.008545" iyz="0.0" izz="0.0144"/>
+      </inertial>
+    </link>
+    <joint name="engine_propeller_joint" type="continuous">
+      <axis rpy="0 0 0" xyz="1 0 0"/>
+      <parent link="sailboat/base_link"/>
+      <child link="sailboat/propeller"/>
+      <origin rpy="0 0 0" xyz="-1.6 0 -0.2"/>
+      <limit effort="100" velocity="100"/>
+      <dynamics damping="0.05" friction="0.05"/>
+    </joint>
+
+
+    <!-- Standard plugin - Publish robot state information -->
+    <gazebo>
+
+      <plugin filename="libignition-gazebo-pose-publisher-system.so" name="ignition::gazebo::systems::PosePublisher">
+        <publish_link_pose>false</publish_link_pose>
+        <publish_sensor_pose>true</publish_sensor_pose>
+        <publish_collision_pose>true</publish_collision_pose>
+        <publish_visual_pose>false</publish_visual_pose>
+        <publish_nested_model_pose>false</publish_nested_model_pose>
+        <publish_model_pose>false</publish_model_pose>
+        <use_pose_vector_msg>true</use_pose_vector_msg>
+        <static_publisher>false</static_publisher>
+        <static_update_frequency>1</static_update_frequency>
+      </plugin>
+      <plugin filename="ignition-gazebo-joint-state-publisher-system" name="ignition::gazebo::systems::JointStatePublisher">
+      </plugin>
+
+    <!-- Standard plugin - Thrusters and joint controllers -->
+      <plugin filename="ignition-gazebo-thruster-system" name="ignition::gazebo::systems::Thruster">
+        <joint_name>sailboat/engine_propeller_joint</joint_name>
+        <thrust_coefficient>0.004422</thrust_coefficient>
+        <fluid_density>1000</fluid_density>
+        <propeller_diameter>0.2</propeller_diameter>
+        <velocity_control>true</velocity_control>
+        <!-- max total thrust / 2 -->
+        <max_thrust_cmd>5000.0</max_thrust_cmd>
+        <namespace>sailboat</namespace>
+        <topic>thrust</topic>
+        <!-- Not used by Gazebo but used to run the bridge easily -->
+      </plugin>
+
+      <plugin filename="ignition-gazebo-joint-position-controller-system" name="ignition::gazebo::systems::JointPositionController">
+        <joint_name>wing_joint</joint_name>
+        <use_velocity_commands>true</use_velocity_commands>
+        <topic>sailboat/wing/pos</topic>
+        <name>wing</name>
+      </plugin>
+
+        <plugin filename="ignition-gazebo-joint-position-controller-system" name="ignition::gazebo::systems::JointPositionController">
+        <joint_name>rudder_joint</joint_name>
+        <use_velocity_commands>true</use_velocity_commands>
+        <topic>sailboat/rudder/pos</topic>
+        <!-- Not used by Gazebo but used to run the bridge easily -->
+        <name>wing</name>
+      </plugin>
+
+
+    <!-- Custom plugin for simulating hull dynamics-->
+      <plugin filename="Hull" name="boating::Hull">
+        <link_name>sailboat/base_link</link_name>
+        <hull_length>6.0</hull_length>
+        <hull_radius>2.5</hull_radius>
+        <fluid_level>0</fluid_level>
+        <points>
+          <point>1.4 1.03 ${zsurf}</point>
+          <point>-1.4 1.03 ${zsurf}</point>
+        </points>
+        <wavefield>
+          <topic>/vrx/wavefield/parameters</topic>
+        </wavefield>
+      </plugin>
+
+
+  <!-- Standard plugin for water hydrodynamics -->
+    <plugin filename="ignition-gazebo-hydrodynamics-system" name="ignition::gazebo::systems::Hydrodynamics">
+
+      <link_name>sailboat/base_link</link_name>
+
+     <!-- water current topic  -->
+
+
+      <!-- no added mass -->
+    <disable_added_mass>true</disable_added_mass>
+
+      <!-- Negative linear damping -->
+      <xU>-182.0</xU>
+      <yV>-183.0</yV>
+      <zW>-1000</zW>
+      <kP>-550</kP>
+      <mQ>-1349</mQ>
+      <nR>-1199</nR>
+
+      <!-- Negative quadratic damping -->
+      <xUabsU>-224.0</xUabsU>
+      <yVabsV>-149</yVabsV>
+      <zWabsW>-72.36</zWabsW>
+      <kPabsP>-734</kPabsP>
+      <mQabsQ>-1102</mQabsQ>
+      <nRabsR>-979</nRabsR>
+    </plugin>
+
+  <!-- Standard plugin for air hydrodynamics -->
+    <plugin filename="ignition-gazebo-hydrodynamics-system" name="ignition::gazebo::systems::Hydrodynamics">
+
+      <link_name>sailboat/base_link</link_name>
+
+     <!-- air current (e.g. wind) topic  -->
+      <disable_added_mass>true</disable_added_mass>
+
+      <!-- Negative linear damping (totally random for now) -->
+      <xU>-0.1</xU>
+      <yV>-0.1</yV>
+      <zW>-1</zW>
+      <kP>-0.5</kP>
+      <mQ>-0.5</mQ>
+      <nR>-0.5</nR>
+    </plugin>
+
+
+    </gazebo>
+
+
+  </robot>

@@ -39,7 +39,7 @@ private:
 
   inline void onCurrentMsg(const gz::msgs::Vector3d &_msg)
   {
-    std::lock_guard lock(mtx);
+    const auto lock{std::lock_guard(mtx)};
     currentVector = gz::msgs::Convert(_msg);
   }
 
@@ -51,9 +51,9 @@ public:
   }
 
   // get the current flow in world frame
-  inline auto flow() const
+  inline auto flow()
   {
-    std::lock_guard lock(mtx);
+    const auto lock{std::lock_guard(mtx)};
     return currentVector;
   }
   };

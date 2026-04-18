@@ -113,7 +113,7 @@ install(
 list(APPEND BOATING_GZ_SRC
   Hull
   WaveVisual
-  Anemometer
+ # Anemometer # later
   LiftDrag
   PublisherPlugin
 )
@@ -140,7 +140,7 @@ install(TARGETS ${BOATING_GZ_PLUGINS} DESTINATION lib)
 # Resources
 install(DIRECTORY
   models
-  worlds
+  example
   DESTINATION share/${PROJECT_NAME})
 
 ament_package()
