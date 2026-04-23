@@ -9,7 +9,7 @@
             <uri>meshes/waterlow.dae</uri>
           </mesh>
         </geometry>
-        <plugin filename="libWaveVisual.so" name="maritime::WaveVisual">
+        <plugin filename="boating-WaveVisual" name="boating::WaveVisual">
           <shader>
             <vertex>materials/programs/GerstnerWaves_vs_330.glsl</vertex>
             <fragment>materials/programs/GerstnerWaves_fs_330.glsl</fragment>
@@ -24,7 +24,7 @@
             </parameters>
           </shader>
           <wavefield>
-            <topic>/gazebo/wavefield/parameters</topic>
+            <topic>/wavefield</topic>
           </wavefield>
         </plugin>
         <visibility_flags>8</visibility_flags>

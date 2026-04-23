@@ -26,10 +26,10 @@
 #include "PublisherPlugin.hh"
 
 using namespace gz;
-using namespace vrx;
+using namespace boating;
 
 /// \brief Private PublisherPlugin data class.
-class vrx::PublisherPlugin::Implementation
+class boating::PublisherPlugin::Implementation
 {
   /// \brief Class that holds necessary bits for each specified message.
   public: struct MessageInfo
@@ -186,5 +186,5 @@ GZ_ADD_PLUGIN(PublisherPlugin,
               PublisherPlugin::ISystemConfigure,
               PublisherPlugin::ISystemPreUpdate)
 
-GZ_ADD_PLUGIN_ALIAS(vrx::PublisherPlugin,
-                    "vrx::PublisherPlugin")
+GZ_ADD_PLUGIN_ALIAS(boating::PublisherPlugin,
+                    "boating::PublisherPlugin")

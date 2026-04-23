@@ -392,7 +392,7 @@
 
     <!-- The wave field -->
     <plugin filename="boating-PublisherPlugin" name="boating::PublisherPlugin">
-      <message type="gz.msgs.Param" topic="/gazebo/wavefield/parameters"
+      <message type="gz.msgs.Param" topic="/wavefield"
                every="2.0">
         params {
           key: "direction"

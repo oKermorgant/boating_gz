@@ -3,12 +3,13 @@ from simple_launch import SimpleLauncher, GazeboBridge
 
 def generate_launch_description():
 
-
     sl = SimpleLauncher(use_sim_time=True)
     sl.declare_arg('manual', True)
 
-    # launch world
-    sl.gz_launch(sl.find('boating_gz', 'sydney_regatta.sdf'))
+    # launch world and clock / current / wind bridges
+    sl.include('boating_gz', 'world_launch.py',
+            launch_arguments={'world_file': sl.find('boating_gz', 'sydney_regatta.sdf'),
+                                'gz_args': ''})
 
     name = 'sailboat'
 
@@ -19,12 +20,11 @@ def generate_launch_description():
         sl.spawn_gz_model(name)
 
         # run bridges
-        bridges = [GazeboBridge.clock()]
-
+        bridges = []
 
         # add bridges for this model
         bridges = []
-        bridges.append((f'/world/{GazeboBridge.world()}/model/{name}/joint_state',
+        bridges.append((f'/world/sydney_regatta/model/{name}/joint_state',
                         'joint_states',
                         'sensor_msgs/msg/JointState', GazeboBridge.gz2ros))
         # main prop
@@ -37,8 +37,17 @@ def generate_launch_description():
                         f'{joint}/cmd_pos',
                         'std_msgs/Float64', GazeboBridge.ros2gz))
 
-        # TODO in practicesensors, not used in Gz demo
 
 
-    sl.create_gz_bridge(bridges)
+        # TODO also in practice sensors, not used in this Gz demo
+
+
+        sl.create_gz_bridge(bridges)
+
+
+        # run sliders for manual actuation
+        sl.node('slider_publisher', arguments = sl.find('boating_gz', 'manual.yaml'))
+
+
+
     return sl.launch_description()

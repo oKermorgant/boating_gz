@@ -1,4 +1,4 @@
-  <?xml version="1.0" ?>
+<!-- <?xml version="1.0" ?> -->
 
   <!-- rigid wing with gazebo plugins for dynamics -->
   <robot name="sailboat" xmlns:xacro="http://www.ros.org/wiki/xacro">
@@ -132,8 +132,9 @@
         <inertia ixx="0.008545" ixy="0.0" ixz="0.0" iyy="0.008545" iyz="0.0" izz="0.0144"/>
       </inertial>
     </link>
+
     <joint name="engine_propeller_joint" type="continuous">
-      <axis rpy="0 0 0" xyz="1 0 0"/>
+      <axis xyz="1 0 0"/>
       <parent link="sailboat/base_link"/>
       <child link="sailboat/propeller"/>
       <origin rpy="0 0 0" xyz="-1.6 0 -0.2"/>
@@ -161,7 +162,7 @@
 
     <!-- Standard plugin - Thrusters and joint controllers -->
       <plugin filename="ignition-gazebo-thruster-system" name="ignition::gazebo::systems::Thruster">
-        <joint_name>sailboat/engine_propeller_joint</joint_name>
+        <joint_name>engine_propeller_joint</joint_name>
         <thrust_coefficient>0.004422</thrust_coefficient>
         <fluid_density>1000</fluid_density>
         <propeller_diameter>0.2</propeller_diameter>
@@ -190,7 +191,7 @@
 
 
     <!-- Custom plugin for simulating hull dynamics-->
-      <plugin filename="Hull" name="boating::Hull">
+      <plugin filename="boating-Hull" name="boating::Hull">
         <link_name>sailboat/base_link</link_name>
         <hull_length>6.0</hull_length>
         <hull_radius>2.5</hull_radius>
@@ -200,7 +201,21 @@
           <point>-1.4 1.03 ${zsurf}</point>
         </points>
         <wavefield>
-          <topic>/vrx/wavefield/parameters</topic>
+          <topic>/wavefield</topic>
+        </wavefield>
+      </plugin>
+
+      <plugin filename="boating-Hull" name="boating::Hull">
+        <link_name>sailboat/base_link</link_name>
+        <hull_length>6.0</hull_length>
+        <hull_radius>2.5</hull_radius>
+        <fluid_level>0</fluid_level>
+        <points>
+          <point>1.4 -1.03 ${zsurf}</point>
+          <point>-1.4 -1.03 ${zsurf}</point>
+        </points>
+        <wavefield>
+          <topic>/wavefield</topic>
         </wavefield>
       </plugin>
 

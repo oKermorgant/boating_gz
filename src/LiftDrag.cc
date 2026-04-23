@@ -128,13 +128,13 @@ public: void Load(const EntityComponentManager &_ecm,
 
     if(_sdf->HasElement("flow_topic"))
     {
-      this->flow.subcribeToCurrent(_sdf->GetElement("flow_topic")->Get<std::string>());
+      this->flow.subcribeTo(_sdf->GetElement("flow_topic")->Get<std::string>());
     }
     else
     {
       const auto linkName{_sdf->GetElement("link_name")->Get<std::string>()};
       gzwarn << "boating::LiftDrag plugin attached to [" << linkName << "] has no 'flow_topic' parameter specified. "
-             << "No wind or water current will be considered.\n";
+             << "No varying wind or water current will be considered.\n";
     }
 
     // If we reached here, we have a valid configuration

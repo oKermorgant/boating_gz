@@ -45,7 +45,12 @@ private:
 
 public:
 
-  inline void subcribeToCurrent(const std::string &topic)
+  inline void init(double x, double y, double z)
+  {
+    currentVector = gz::math::Vector3d(x, y, z);
+  }
+
+  inline void subcribeTo(const std::string &topic)
   {
     node.Subscribe(topic, &Flow::onCurrentMsg, this);
   }

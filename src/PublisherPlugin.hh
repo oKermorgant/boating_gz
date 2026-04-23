@@ -15,14 +15,14 @@
  *
  */
 
-#ifndef VRX_PUBLISHERPLUGIN_HH_
-#define VRX_PUBLISHERPLUGIN_HH_
+#ifndef BOATING_PUBLISHERPLUGIN_HH_
+#define BOATING_PUBLISHERPLUGIN_HH_
 
 #include <gz/sim/System.hh>
 #include <gz/utils/ImplPtr.hh>
 #include <sdf/sdf.hh>
 
-namespace vrx
+namespace boating
 {
   /// \brief A system to publish user specified messages at a given time.
   /// It's also possible to publish the message repeatedly.
