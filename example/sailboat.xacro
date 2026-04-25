@@ -170,8 +170,8 @@
         <!-- max total thrust / 2 -->
         <max_thrust_cmd>5000.0</max_thrust_cmd>
         <namespace>sailboat</namespace>
-        <topic>thrust</topic>
         <!-- Not used by Gazebo but used to run the bridge easily -->
+        <topic>thrust</topic>
       </plugin>
 
       <plugin filename="ignition-gazebo-joint-position-controller-system" name="ignition::gazebo::systems::JointPositionController">
@@ -184,40 +184,40 @@
         <plugin filename="ignition-gazebo-joint-position-controller-system" name="ignition::gazebo::systems::JointPositionController">
         <joint_name>rudder_joint</joint_name>
         <use_velocity_commands>true</use_velocity_commands>
-        <topic>sailboat/rudder/pos</topic>
         <!-- Not used by Gazebo but used to run the bridge easily -->
+        <topic>sailboat/rudder/pos</topic>
         <name>wing</name>
       </plugin>
 
 
     <!-- Custom plugin for simulating hull dynamics-->
-      <plugin filename="boating-Hull" name="boating::Hull">
-        <link_name>sailboat/base_link</link_name>
-        <hull_length>6.0</hull_length>
-        <hull_radius>2.5</hull_radius>
-        <fluid_level>0</fluid_level>
-        <points>
-          <point>1.4 1.03 ${zsurf}</point>
-          <point>-1.4 1.03 ${zsurf}</point>
-        </points>
-        <wavefield>
-          <topic>/wavefield</topic>
-        </wavefield>
-      </plugin>
+    <plugin filename="boating-Hull" name="boating::Hull">
+      <link_name>sailboat/base_link</link_name>
+      <hull_length>6.0</hull_length>
+      <hull_radius>2.5</hull_radius>
+      <fluid_level>0</fluid_level>
+      <points>
+        <point>1.4 1.03 ${zsurf}</point>
+        <point>-1.4 1.03 ${zsurf}</point>
+      </points>
+      <wavefield>
+        <topic>/wavefield</topic>
+      </wavefield>
+    </plugin>
 
-      <plugin filename="boating-Hull" name="boating::Hull">
-        <link_name>sailboat/base_link</link_name>
-        <hull_length>6.0</hull_length>
-        <hull_radius>2.5</hull_radius>
-        <fluid_level>0</fluid_level>
-        <points>
-          <point>1.4 -1.03 ${zsurf}</point>
-          <point>-1.4 -1.03 ${zsurf}</point>
-        </points>
-        <wavefield>
-          <topic>/wavefield</topic>
-        </wavefield>
-      </plugin>
+    <plugin filename="boating-Hull" name="boating::Hull">
+      <link_name>sailboat/base_link</link_name>
+      <hull_length>6.0</hull_length>
+      <hull_radius>2.5</hull_radius>
+      <fluid_level>0</fluid_level>
+      <points>
+        <point>1.4 -1.03 ${zsurf}</point>
+        <point>-1.4 -1.03 ${zsurf}</point>
+      </points>
+      <wavefield>
+        <topic>/wavefield</topic>
+      </wavefield>
+    </plugin>
 
 
   <!-- Standard plugin for water hydrodynamics -->
@@ -226,7 +226,6 @@
       <link_name>sailboat/base_link</link_name>
 
      <!-- water current topic : default to /ocean_current -->
-
 
       <!-- no added mass -->
     <disable_added_mass>true</disable_added_mass>
@@ -268,6 +267,55 @@
       <nR>-0.5</nR>
     </plugin>
 
+    <!-- Modified lift-drag plugin for wing -->
+    <plugin
+      filename="boating-LiftDrag"
+      name="boating::LiftDrag">
+      <a0>0.2</a0>
+      <cla>10.000</cla>
+      <cda>0.0001</cda>
+      <cma>0.00</cma>
+      <alpha_stall>10.0</alpha_stall>
+      <cla_stall>1.0</cla_stall>
+      <cda_stall>0.001</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <cp>0.0 0.5 0</cp>
+      <area>0.2</area>
+
+      <!-- will guess we are in the air and subscribe to /model/wind/ocean_current -->
+      <density>1.2041</density>
+
+      <!-- to be adapted -->
+      <forward>0 0 -1</forward>
+      <upward>-1 0 0</upward>
+      <link_name>sailboat/wing</link_name>
+    </plugin>
+
+
+    <!--plugin
+      filename="boating-LiftDrag"
+      name="boating::LiftDrag">
+      <a0>0.2</a0>
+      <cla>10.000</cla>
+      <cda>0.0001</cda>
+      <cma>0.00</cma>
+      <alpha_stall>10.0</alpha_stall>
+      <cla_stall>1.0</cla_stall>
+      <cda_stall>0.001</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <cp>0.0 0.5 0</cp>
+      <area>0.2</area>
+
+      <!-- will guess we are in the water and subscribe to /ocean_current >
+      <density>1000</density>
+      <!-- or we can impose the flow topic >
+      <flow_topic>/ocean_current</flow_topic>
+
+      < to be adapted >
+      <forward>0 0 -1</forward>
+      <upward>-1 0 0</upward>
+      <link_name>sailboat/rudder</link_name>
+    </plugin-->
 
     </gazebo>
 
