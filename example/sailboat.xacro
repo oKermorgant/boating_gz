@@ -225,7 +225,7 @@
 
       <link_name>sailboat/base_link</link_name>
 
-     <!-- water current topic  -->
+     <!-- water current topic : default to /ocean_current -->
 
 
       <!-- no added mass -->
@@ -253,7 +253,10 @@
 
       <link_name>sailboat/base_link</link_name>
 
-     <!-- air current (e.g. wind) topic  -->
+     <!-- air current (e.g. wind) topic: /model/wind/ocean_current
+          because this plugin is designed for water current -->
+      <namespace>wind</namespace>
+
       <disable_added_mass>true</disable_added_mass>
 
       <!-- Negative linear damping (totally random for now) -->

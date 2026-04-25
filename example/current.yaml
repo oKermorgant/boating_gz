@@ -1,0 +1,20 @@
+/current:
+    type: geometry_msgs/Vector3
+    x:
+        min: -5
+        max: 5
+        to: x
+    y:
+        min: -5
+        max: 5
+        to: y
+/wind:
+    type: geometry_msgs/Vector3
+    x:
+        min: -5
+        max: 5
+        to: x
+    y:
+        min: -5
+        max: 5
+        to: y

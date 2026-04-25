@@ -16,5 +16,9 @@ def generate_launch_description():
         bridges.append((gz, ros, 'geometry_msgs/Vector3', GazeboBridge.ros2gz))
 
     sl.create_gz_bridge(bridges)
+
+    # run current / wind slider
+    sl.node('slider_publisher',
+            arguments = sl.find('boating_gz', 'current.yaml'))
     return sl.launch_description()
 
