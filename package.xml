@@ -10,6 +10,8 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <exec_depend>launch</exec_depend>
+  <exec_depend>simple_launch</exec_depend>
+  <exec_depend>slider_publisher</exec_depend>
   <exec_depend condition="$GZ_VERSION > fortress">ros_gz_sim</exec_depend>
   <exec_depend condition="$GZ_VERSION == fortress">ros_ign_gazebo</exec_depend>
 
