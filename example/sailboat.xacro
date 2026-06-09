@@ -292,7 +292,7 @@
     </plugin>
 
 
-    <!--plugin
+    <plugin
       filename="boating-LiftDrag"
       name="boating::LiftDrag">
       <a0>0.2</a0>
@@ -306,16 +306,16 @@
       <cp>0.0 0.5 0</cp>
       <area>0.2</area>
 
-      <!-- will guess we are in the water and subscribe to /ocean_current >
+      <!--will guess we are in the water and subscribe to /ocean_current-->
       <density>1000</density>
-      <!-- or we can impose the flow topic >
+      <!--or we can impose the flow topic-->
       <flow_topic>/ocean_current</flow_topic>
 
-      < to be adapted >
+      <!--to be adapted-->
       <forward>0 0 -1</forward>
       <upward>-1 0 0</upward>
       <link_name>sailboat/rudder</link_name>
-    </plugin-->
+    </plugin>
 
     </gazebo>
 

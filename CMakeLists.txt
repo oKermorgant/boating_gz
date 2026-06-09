@@ -133,8 +133,10 @@ foreach(PLUGIN ${BOATING_GZ_SRC})
   list(APPEND BOATING_GZ_PLUGINS boating-${PLUGIN})
 endforeach()
 
-install(TARGETS ${BOATING_GZ_PLUGINS} DESTINATION lib)
+ament_environment_hooks("hooks/resource_paths.dsv.in")
 
+
+install(TARGETS ${BOATING_GZ_PLUGINS} DESTINATION lib)
 
 #============================================================================
 # Resources

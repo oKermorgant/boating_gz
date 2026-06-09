@@ -6,7 +6,7 @@ def generate_launch_description():
     sl = SimpleLauncher(use_sim_time=True)
     # launch world
     sl.gz_launch(sl.declare_arg('world_file', sl.find('boating_gz', 'sydney_regatta.sdf')),
-                 sl.declare_arg('gz_args', ''))
+                 sl.declare_arg('gz_args', '-r'))
 
     # run bridges for clock and wind / water current
     bridges = [GazeboBridge.clock()]
