@@ -6,10 +6,7 @@ def generate_launch_description():
     sl = SimpleLauncher(use_sim_time=True)
     sl.declare_arg('manual', True)
 
-    # launch world and clock / current / wind bridges
-    sl.include('boating_gz', 'world_launch.py',
-            launch_arguments={'world_file': sl.find('boating_gz', 'sydney_regatta.sdf'),
-                                'gz_args': ''})
+    GazeboBridge.set_world_name('sydney_regatta')
 
     name = 'sailboat'
 
