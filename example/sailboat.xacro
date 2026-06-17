@@ -4,8 +4,8 @@
   <robot name="sailboat" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
 
-    <xacro:arg name="mast" default="0.3"/>
-    <xacro:property name="mast" value="$(arg mast)"/>
+<!--     <xacro:arg name="mast" default=""/> -->
+    <xacro:property name="mast" value="0.3"/>
     <xacro:arg name="rudder_x" default="-2.1"/>
     <xacro:arg name="rudder_z" default="-0.05"/>
 
@@ -259,8 +259,8 @@
       <disable_added_mass>true</disable_added_mass>
 
       <!-- Negative linear damping (totally random for now) -->
-      <xU>-0.1</xU>
-      <yV>-0.1</yV>
+      <xU>-10.1</xU>
+      <yV>-10.1</yV>
       <zW>-1</zW>
       <kP>-0.5</kP>
       <mQ>-0.5</mQ>
