@@ -28,8 +28,12 @@ def generate_launch_description():
         bridges.append((f'/{name}/thrust',
                         'thrust',
                         'std_msgs/Float64', GazeboBridge.ros2gz))
+        # second prop
+        bridges.append((f'/{name}/thrust2',
+                        'thrust2',
+                        'std_msgs/Float64', GazeboBridge.ros2gz))
         # rudder and wing
-        for joint in ('rudder','wing'):
+        for joint in ('rudder','rudder2','wing'):
             bridges.append((f'/{name}/{joint}/pos',
                         f'{joint}/cmd_pos',
                         'std_msgs/Float64', GazeboBridge.ros2gz))

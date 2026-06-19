@@ -1,14 +1,24 @@
 wing/cmd_pos:
     type: std_msgs/Float64
     wing:
-        min: -pi/2
-        max: pi/2
+        min: -pi
+        max: pi
 rudder/cmd_pos:
     type: std_msgs/Float64
     rudder:
-        min: -pi/4
-        max: pi/4
+        min: -pi
+        max: pi
+rudder2/cmd_pos:
+    type: std_msgs/Float64
+    rudder2:
+        min: -pi
+        max: pi
 thrust:
+    type: std_msgs/Float64
+    thrust:
+        min: -400
+        max: 400
+thrust2:
     type: std_msgs/Float64
     thrust:
         min: -400

@@ -6,8 +6,8 @@
 
     <xacro:arg name="mast" default="0.3"/>
     <xacro:property name="mast" value="$(arg mast)"/>
-    <xacro:arg name="rudder_x" default="-2.1"/>
-    <xacro:arg name="rudder_z" default="-0.05"/>
+    <xacro:property name="rudder_x" value="-2.1"/>
+    <xacro:property name="rudder_z" value="-0.05"/>
 
     <xacro:property name="zsurf" value="-0.15"/>
 
@@ -33,6 +33,9 @@
     </material>
     <material name="grey">
       <color rgba=".3 .3 .3 1"/>
+    </material>
+    <material name="red">
+      <color rgba=".9 .1 .1 1"/>
     </material>
 
     <gazebo>
@@ -68,6 +71,41 @@
       </inertial>
     </link>
 
+    <!--Proa Float -->
+    <link name="sailboat/proa_link">
+      <visual>
+        <geometry>
+          <mesh filename="file://$(find boating_gz)/example/mesh/hull.stl"/>
+        </geometry>
+        <material name="hull"/>
+      </visual>
+        <visual>
+        <origin xyz="0 0 ${1.5*mast}"/>
+        <geometry>
+          <cylinder length="${2*mast}" radius=".04"/>
+        </geometry>
+        <material name="grey"/>
+      </visual>
+
+      <!-- Simple model collision -->
+      <collision name="proa_float">
+        <geometry>
+          <mesh filename="file://$(find boating_gz)/example/mesh/hull.stl"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 -1."/>
+        <!-- TODO update inertia -->
+        <mass value="100.0"/>
+        <inertia ixx="120.0" ixy="0.0" ixz="0.0" iyy="393" iyz="0.0" izz="446.0"/>
+      </inertial>
+    </link>
+
+    <joint name="proa_joint" type="fixed">
+      <parent link="sailboat/base_link"/>
+      <child link="sailboat/proa_link"/>
+      <origin rpy="0 0 0" xyz="0 -4 0"/>
+    </joint>
 
     <!-- wing -->
 
@@ -86,7 +124,7 @@
       <child link="sailboat/wing"/>
       <axis xyz="0 0 1"/>
       <origin rpy="0 0 0" xyz="0 0 ${2*mast}"/>
-      <limit effort="100" velocity="100" lower="${-.8*pi/2}" upper="${.8*pi/2}"/>
+      <limit effort="100" velocity="100" lower="${-pi}" upper="${pi}"/>
       <dynamics damping="0.05" friction="0.05"/>
     </joint>
 
@@ -105,11 +143,32 @@
       <parent link="sailboat/base_link"/>
       <child link="sailboat/rudder"/>
       <axis xyz="0 0 1"/>
-      <origin rpy="0 0 0" xyz="$(arg rudder_x) 0 $(arg rudder_z)"/>
-      <limit effort="100" velocity="100" lower="${-pi/4}" upper="${pi/4}"/>
+      <origin rpy="0 0 0" xyz="${rudder_x} 0 ${rudder_z}"/>
+      <limit effort="100" velocity="50" lower="${-pi}" upper="${pi}"/>
       <dynamics damping="0.05" friction="0.05"/>
     </joint>
 
+
+    <link name="sailboat/rudder2">
+        <visual>
+        <geometry>
+          <mesh filename="file://$(find boating_gz)/example/mesh/rudder.stl"/>
+        </geometry>
+        <material name="rudder"/>
+      </visual>
+      <xacro:inertia mass="2"/>
+    </link>
+
+    <joint name="rudder2_joint" type="revolute">
+      <parent link="sailboat/base_link"/>
+      <child link="sailboat/rudder2"/>
+      <axis xyz="0 0 1"/>
+      <origin rpy="0 0 0" xyz="1 0 ${rudder_z}"/>
+      <limit effort="100" velocity="50" lower="${-pi}" upper="${pi}"/>
+      <dynamics damping="0.05" friction="0.05"/>
+    </joint>
+
+    
 
 
     <!-- Engine / propellers -->
@@ -118,8 +177,9 @@
       <visual>
         <geometry>
           <mesh filename="file://$(find boating_gz)/example/mesh/propeller.dae"
-                scale=".4 .4 .4"/>
+                scale=".6 .6 .6"/>
         </geometry>
+        <material name="red"/>
       </visual>
       <collision name="propeller_collision">
         <origin rpy="0 1.57 0" xyz="-0.08 0 0"/>
@@ -135,9 +195,38 @@
 
     <joint name="engine_propeller_joint" type="continuous">
       <axis xyz="1 0 0"/>
-      <parent link="sailboat/base_link"/>
+      <parent link="sailboat/rudder"/>
       <child link="sailboat/propeller"/>
-      <origin rpy="0 0 0" xyz="-1.6 0 -0.2"/>
+      <origin rpy="0 0 0" xyz="0 0 -0.2"/>
+      <limit effort="100" velocity="100"/>
+      <dynamics damping="0.05" friction="0.05"/>
+    </joint>
+
+    <link name="sailboat/propellerproa">
+      <visual>
+        <geometry>
+          <mesh filename="file://$(find boating_gz)/example/mesh/propeller.dae"
+                scale=".6 .6 .6"/>
+        </geometry>
+        <material name="red"/>
+      </visual>
+      <collision name="propellerproa_collision">
+        <origin rpy="0 1.57 0" xyz="-0.08 0 0"/>
+        <geometry>
+          <cylinder length="0.18" radius="0.24"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="0.5"/>
+        <inertia ixx="0.008545" ixy="0.0" ixz="0.0" iyy="0.008545" iyz="0.0" izz="0.0144"/>
+      </inertial>
+    </link>
+
+    <joint name="engine_propellerproa_joint" type="continuous">
+      <axis xyz="1 0 0"/>
+      <parent link="sailboat/rudder2"/>
+      <child link="sailboat/propellerproa"/>
+      <origin rpy="0 0 0" xyz="0 0 -0.2"/>
       <limit effort="100" velocity="100"/>
       <dynamics damping="0.05" friction="0.05"/>
     </joint>
@@ -174,6 +263,19 @@
         <topic>thrust</topic>
       </plugin>
 
+      <plugin filename="ignition-gazebo-thruster-system" name="ignition::gazebo::systems::Thruster">
+        <joint_name>engine_propellerproa_joint</joint_name>
+        <thrust_coefficient>0.004422</thrust_coefficient>
+        <fluid_density>1000</fluid_density>
+        <propeller_diameter>0.2</propeller_diameter>
+        <velocity_control>true</velocity_control>
+        <!-- max total thrust / 2 -->
+        <max_thrust_cmd>5000.0</max_thrust_cmd>
+        <namespace>sailboat</namespace>
+        <!-- Not used by Gazebo but used to run the bridge easily -->
+        <topic>thrust2</topic>
+      </plugin>
+
       <plugin filename="ignition-gazebo-joint-position-controller-system" name="ignition::gazebo::systems::JointPositionController">
         <joint_name>wing_joint</joint_name>
         <use_velocity_commands>true</use_velocity_commands>
@@ -181,11 +283,19 @@
         <name>wing</name>
       </plugin>
 
-        <plugin filename="ignition-gazebo-joint-position-controller-system" name="ignition::gazebo::systems::JointPositionController">
+      <plugin filename="ignition-gazebo-joint-position-controller-system" name="ignition::gazebo::systems::JointPositionController">
         <joint_name>rudder_joint</joint_name>
         <use_velocity_commands>true</use_velocity_commands>
         <!-- Not used by Gazebo but used to run the bridge easily -->
         <topic>sailboat/rudder/pos</topic>
+        <name>wing</name>
+      </plugin>
+
+      <plugin filename="ignition-gazebo-joint-position-controller-system" name="ignition::gazebo::systems::JointPositionController">
+        <joint_name>rudder2_joint</joint_name>
+        <use_velocity_commands>true</use_velocity_commands>
+        <!-- Not used by Gazebo but used to run the bridge easily -->
+        <topic>sailboat/rudder2/pos</topic>
         <name>wing</name>
       </plugin>
 
@@ -199,12 +309,33 @@
       <points>
         <point>1.4 1.03 ${zsurf}</point>
         <point>-1.4 1.03 ${zsurf}</point>
+        <point>1.4 -1.03 ${zsurf}</point>
+        <point>-1.4 -1.03 ${zsurf}</point>
       </points>
       <wavefield>
         <topic>/wavefield</topic>
       </wavefield>
     </plugin>
 
+    <!-- Custom plugin for simulating hull dynamics-->
+    <plugin filename="boating-Hull" name="boating::Hull">
+      <link_name>sailboat/proa_link</link_name>
+      <hull_length>6.0</hull_length>
+      <hull_radius>2.5</hull_radius>
+      <fluid_level>0</fluid_level>
+      <points>
+        <point>1.4 1.03 ${zsurf}</point>
+        <point>-1.4 1.03 ${zsurf}</point>
+        <point>1.4 -1.03 ${zsurf}</point>
+        <point>-1.4 -1.03 ${zsurf}</point>
+      </points>
+      <wavefield>
+        <topic>/wavefield</topic>
+      </wavefield>
+    </plugin>
+
+    
+    <!-- Unnecessary section?
     <plugin filename="boating-Hull" name="boating::Hull">
       <link_name>sailboat/base_link</link_name>
       <hull_length>6.0</hull_length>
@@ -218,12 +349,16 @@
         <topic>/wavefield</topic>
       </wavefield>
     </plugin>
+    -->
 
 
   <!-- Standard plugin for water hydrodynamics -->
     <plugin filename="ignition-gazebo-hydrodynamics-system" name="ignition::gazebo::systems::Hydrodynamics">
 
       <link_name>sailboat/base_link</link_name>
+      <link_name>sailboat/proa_link</link_name>
+      <link_name>sailboat/rudder</link_name>
+      <link_name>sailboat/rudder2</link_name>
 
      <!-- water current topic : default to /ocean_current -->
 
@@ -247,10 +382,13 @@
       <nRabsR>-979</nRabsR>
     </plugin>
 
+
   <!-- Standard plugin for air hydrodynamics -->
     <plugin filename="ignition-gazebo-hydrodynamics-system" name="ignition::gazebo::systems::Hydrodynamics">
 
       <link_name>sailboat/base_link</link_name>
+      <link_name>sailboat/proa_link</link_name>
+
 
      <!-- air current (e.g. wind) topic: /model/wind/ocean_current
           because this plugin is designed for water current -->
@@ -259,38 +397,64 @@
       <disable_added_mass>true</disable_added_mass>
 
       <!-- Negative linear damping (totally random for now) -->
-      <xU>-0.1</xU>
-      <yV>-0.1</yV>
+      <xU>-1</xU>
+      <yV>-1</yV>
       <zW>-1</zW>
       <kP>-0.5</kP>
       <mQ>-0.5</mQ>
       <nR>-0.5</nR>
     </plugin>
 
+
+    <plugin
+        filename="gz-sim-lift-drag-system"
+        name="gz::sim::systems::LiftDrag">
+        <a0>0.1</a0>
+        <cla>0.1</cla>
+        <cda>0.001</cda>
+        <cma>0.0</cma>
+        <cp>0.0 0.5 0</cp>
+        <area>0.2</area>
+        <flow_topic>/model/wind/ocean_current</flow_topic>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>sailboat/wing</link_name>
+      </plugin>
+
+
     <!-- Modified lift-drag plugin for wing -->
+
+    
     <plugin
       filename="boating-LiftDrag"
       name="boating::LiftDrag">
-      <a0>0.2</a0>
-      <cla>10.000</cla>
+      <a0>0.087</a0>
+      <cla>5.400</cla>
       <cda>0.0001</cda>
-      <cma>0.00</cma>
-      <alpha_stall>10.0</alpha_stall>
-      <cla_stall>1.0</cla_stall>
+      <cma>0.001</cma>
+      <alpha_stall>0.33</alpha_stall>
+      <cla_stall>-2.10</cla_stall>
       <cda_stall>0.001</cda_stall>
       <cma_stall>0.0</cma_stall>
-      <cp>0.0 0.5 0</cp>
+      <cp>0.0 0 1</cp>
       <area>0.2</area>
 
       <!-- will guess we are in the air and subscribe to /model/wind/ocean_current -->
+
+
+
       <density>1.2041</density>
 
       <!-- to be adapted -->
-      <forward>0 0 -1</forward>
-      <upward>-1 0 0</upward>
+      <forward>-1 0 0</forward>
+      <upward>0 -1 0</upward>
       <link_name>sailboat/wing</link_name>
     </plugin>
+  
 
+        
+      
 
     <plugin
       filename="boating-LiftDrag"
@@ -315,6 +479,7 @@
       <forward>0 0 -1</forward>
       <upward>-1 0 0</upward>
       <link_name>sailboat/rudder</link_name>
+      <link_name>sailboat/rudder2</link_name>
     </plugin>
 
     </gazebo>

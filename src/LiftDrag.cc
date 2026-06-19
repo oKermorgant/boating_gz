@@ -158,13 +158,7 @@ public: void Update(EntityComponentManager &_ecm)
     const auto worldPose =
         _ecm.Component<components::WorldPose>(this->linkEntity);
 
-    // get wind as a component from the _ecm
-    components::WorldLinearVelocity *windLinearVel = nullptr;
-    if(_ecm.EntityByComponents(components::Wind()) != kNullEntity){
-      Entity windEntity = _ecm.EntityByComponents(components::Wind());
-      windLinearVel =
-          _ecm.Component<components::WorldLinearVelocity>(windEntity);
-    }
+    
     components::JointPosition *controlJointPosition = nullptr;
 
     if (!worldLinVel || !worldAngVel || !worldPose)
@@ -174,12 +168,9 @@ public: void Update(EntityComponentManager &_ecm)
 
     const auto &pose = worldPose->Data();
     const auto cpWorld = pose.Rot().RotateVector(this->cp);
-    auto vel = worldLinVel->Data() + worldAngVel->Data().Cross(
-                   cpWorld);
-    if (windLinearVel != nullptr){
-      vel = worldLinVel->Data() + worldAngVel->Data().Cross(
-                cpWorld) - windLinearVel->Data();
-    }
+    
+    const auto vel = worldLinVel->Data() + worldAngVel->Data().Cross(
+                   cpWorld) - flow.flow();;
 
     if (vel.Length() <= 0.01)
     {

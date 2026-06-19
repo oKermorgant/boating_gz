@@ -11,10 +11,10 @@
 /wind:
     type: geometry_msgs/Vector3
     x:
-        min: -5
-        max: 5
+        min: -30
+        max: 30
         to: x
     y:
-        min: -5
-        max: 5
+        min: -30
+        max: 30
         to: y
